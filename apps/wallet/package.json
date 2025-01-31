@@ -15,7 +15,7 @@
     "preview": "vite preview",
     "sync:electron": "npm run clean && npm run build && cap sync electron && npx cap update electron",
     "sync": "npm run clean && npm run build && npx cap sync && npx cap update && cap sync electron && npx cap update electron",
-    "test": "echo 'no test'",
+    "test": "vitest",
     "coverage": "npm run test -- --coverage",
     "copyIcons": "node bin/copy-icons.js"
   },
@@ -94,7 +94,8 @@
     "sql.js": "1.6.2",
     "typescript": "^5.5.2",
     "vite": "^5.3.1",
-    "vite-plugin-wasm": "^3.3.0"
+    "vite-plugin-wasm": "^3.3.0",
+    "vitest": "^3.0.4"
   },
   "engines": {
     "node": ">=18.16.0"
