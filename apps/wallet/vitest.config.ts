@@ -5,7 +5,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    deps: { inline: [/ergo-lib-wasm-browser/] }
   },
+  assetsInclude: ['**/*.wasm'],
   resolve: {
     alias: {
       '@': '/src', // Ensure alias resolution works
