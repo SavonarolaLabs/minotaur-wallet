@@ -162,6 +162,16 @@ const generateTx = async (
   receivers: Array<ReceiverType>,
   fee: bigint,
 ) => {
+
+  (BigInt.prototype as any).toJSON = function () {
+    return this.toString();
+  };
+
+  console.log("## input wallet - " + JSON.stringify(wallet));
+  console.log("## input addresses - " + JSON.stringify(addresses));
+  console.log("## input receivers - " + JSON.stringify(receivers));
+  console.log("## input fee - " + fee);
+
   const boxes = await selectBoxes(
     receivers.map((item) => item.amount).reduce((a, b) => a + b, fee),
     receivers.map((item) => item.tokens).reduce((a, b) => [...a, ...b], []),
@@ -192,6 +202,17 @@ const generateTx = async (
   const candidateBoxes = wasm.ErgoBoxCandidates.empty();
   candidates.forEach((box) => candidateBoxes.add(box));
   if (changeBox) candidateBoxes.add(changeBox);
+
+  for (let index = 0; index < boxSelection.boxes().len(); index++) {
+    const box = boxSelection.boxes().get(index);
+    console.log(`## interim boxSelection [${index}] - ${JSON.stringify(box.to_json())}`);
+  }
+  for (let index = 0; index < candidateBoxes.len(); index++) {
+    const candidate = candidateBoxes.get(index);
+    console.log(`## interim candidateBoxes [${index}] - ${candidate.value().as_i64().as_num()}`);
+  }
+  console.log("## interim height - " + JSON.stringify(height));
+
   const tx = wasm.TxBuilder.new(
     boxSelection,
     candidateBoxes,
@@ -200,6 +221,10 @@ const generateTx = async (
     wasm.Address.from_base58(wallet.addresses[0].address),
   ).build();
   // const reduced = wasm.ReducedTransaction.from_unsigned_tx(tx, inputBoxes, wasm.ErgoBoxes.empty(), await network.getContext())
+
+  console.log("## return tx - " + JSON.stringify(tx.to_json()));
+  console.log("## return selectedBoxes - " + JSON.stringify(selectedBoxes.map((item) => item.to_json())));
+
   return { tx, boxes: selectedBoxes };
 };
 
