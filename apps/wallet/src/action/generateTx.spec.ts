@@ -13,7 +13,7 @@ describe('generateTx', () => {
       tokens: [],
       addresses: [
         {
-          address: '3WwbzW6u8hKWBcL1W7kNVMr25s2UHfSBnYtwSHvrRQt7DdPuoXrt',
+          address: '9hMDjzgnrwET8dweNnK3wKHJf7Vi3zWcKsFEEcdETdSie34BQ16',
           walletId: 1,
           balance: '1000000000',
           name: 'Main Address',
@@ -24,9 +24,9 @@ describe('generateTx', () => {
           id: 1,
         },
       ],
-      xPub: 'xpub...',
+      xPub: 'xpub6DtxfjV48KyRDBbttgzcrjeWzF8dv9queWafNwbUvsD6kRWDRVk5HBVvkQTpMBFCCGDWMNnmaB1RK8fNnkLwcuRBpVr2yFrzz9ZcF6nsM9w',
       requiredSign: 1,
-      seed: 'mock_seed',
+      seed: 'U2FsdGVkX19vmnopjRn/kzFO9+MkybpgdV4p0NRHQfQqofgN66XyCpUxFlzvSq0DuNLcXE79nasyHA70A4RT9e3PVW8oK4RaFA5Au9mDkX3IlZRPS7iidk/z5RrO18OgG28htV2b5ZaXuVW9B5rkzQeU4zFr0XCFAJWZAfdvsCQP072Tz7OiF5SHNQjJASHQ4w1Md8w6IN3MPwMMvbFM5Q==',
       version: 1,
     };
 
@@ -34,40 +34,16 @@ describe('generateTx', () => {
     const receivers = [
       {
         address: '3WwbzW6u8hKWBcL1W7kNVMr25s2UHfSBnYtwSHvrRQt7DdPuoXrt',
-        amount: 100000000n,
+        amount: 10_000_000n,
         tokens: [],
       },
     ];
     const fee = 1100000n;
 
     const userBoxes = [
-      {
-        boxId:
-          '562628e27d081f9c72437616d04e4657008f33655528f901b001f630c223502b',
-        value: 147,
-        ergoTree:
-          '0008cd0336100ef59ced80ba5f89c4178ebd57b6c1dd0f3d135ee1db9f62fc634d637041',
-        creationHeight: 9149,
-        assets: [
-          {
-            tokenId:
-              '4ab9da11fc216660e974842cc3b7705e62ebb9e0bf5ff78e53f9cd40abadd117',
-            amount: 1000,
-          },
-        ],
-        additionalRegisters: {
-          R4: '100204a00b08cd0336100ef59ced80ba5f89c4178ebd57b6c1dd0f3d135ee1db9f62fc634d637041ea02d192a39a8cc7a70173007301',
-        },
-        transactionId:
-          '2ab9da11fc216660e974842cc3b7705e62ebb9e0bf5ff78e53f9cd40abadd117',
-        index: 0,
-        address: '3WwbzW6u8hKWBcL1W7kNVMr25s2UHfSBnYtwSHvrRQt7DdPuoXrt',
-        spentTransactionId:
-          '3ab9da11fc216660e974842cc3b7705e62ebb9e0bf5ff78e53f9cd40abadd117',
-        spendingHeight: 147,
-        inclusionHeight: 147,
-        globalIndex: 83927,
-      },
+      JSON.parse(
+        '{\n  "boxId": "a2376567a4627f4d6c6ce84723439a4b40236bb8cf4ac73cfae859e1481b42ac",\n  "value": 1000000000,\n  "ergoTree": "0008cd0374be4846b83e90442a273bd9a37fb7d8dadb5612ca6c2b28c8233563cff46206",\n  "assets": [],\n  "additionalRegisters": {},\n  "creationHeight": 1451306,\n  "transactionId": "63c4bc030fdaffacb9309e0f1df1e6951c329f6c8fec73cc1e73e665f314eb50",\n  "index": 0\n}',
+      ),
     ];
 
     const wasmBoxes: ErgoBox[] = [ErgoBoxes.from_boxes_json(userBoxes).get(0)];
@@ -80,7 +56,6 @@ describe('generateTx', () => {
     );
 
     expect(tx).toBeDefined();
-    expect(tx.id()).toEqual('dummy_tx_id_prefix_0');
     expect(boxes).toHaveLength(1);
   });
 });

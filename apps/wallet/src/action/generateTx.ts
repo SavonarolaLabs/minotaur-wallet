@@ -128,7 +128,9 @@ export async function generateTx(
     height,
     wasm.BoxValue.from_i64(wasm.I64.from_str(fee.toString())),
     wasm.Address.from_base58(wallet.addresses[0].address),
-  ).build();
+  )
+    .build()
+    .to_js_eip12();
 
   return { tx, boxes: selectedBoxes };
 }
