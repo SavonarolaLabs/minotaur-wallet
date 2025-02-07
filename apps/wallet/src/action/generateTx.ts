@@ -2,7 +2,6 @@ import * as wasm from 'ergo-lib-wasm-browser';
 import { ReceiverTokenType, ReceiverType } from '@/types/sign-modal';
 import { BoxDbAction } from './db';
 import { StateWallet } from '@/store/reducer/wallet';
-import getChain from '@/utils/networks';
 import { deserialize } from './box';
 
 const generateCandidates = (height: number, receivers: Array<ReceiverType>) =>
@@ -176,9 +175,7 @@ export async function generateTx(
     throw Error('Not enough erg or tokens: ' + boxes.covering.join(', '));
   }
   const selectedBoxes = boxes.boxes;
-  const chain = getChain(wallet.networkType);
-  const network = chain.getNetwork();
-  const height = await network.getHeight();
+  const height = 1456180;
   const candidates = generateCandidates(height, receivers);
   const changeBox = generateChangeBox(
     selectedBoxes,
