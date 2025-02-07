@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { generateTx } from './generateTx';
-import { ErgoBoxes } from 'ergo-lib-wasm-browser';
+import { ErgoBox, ErgoBoxes } from 'ergo-lib-wasm-browser';
 
 describe('generateTx', () => {
   it('should generate a transaction with valid inputs', async () => {
@@ -70,7 +70,7 @@ describe('generateTx', () => {
       },
     ];
 
-    const wasmBoxes = [ErgoBoxes.from_boxes_json(userBoxes).get(0)];
+    const wasmBoxes: ErgoBox[] = [ErgoBoxes.from_boxes_json(userBoxes).get(0)];
     const { tx, boxes } = await generateTx(
       wallet,
       addresses,
