@@ -41,9 +41,19 @@ describe('generateTx', () => {
     const fee = 1100000n;
 
     const userBoxes = [
-      JSON.parse(
-        '{\n  "boxId": "a2376567a4627f4d6c6ce84723439a4b40236bb8cf4ac73cfae859e1481b42ac",\n  "value": 1000000000,\n  "ergoTree": "0008cd0374be4846b83e90442a273bd9a37fb7d8dadb5612ca6c2b28c8233563cff46206",\n  "assets": [],\n  "additionalRegisters": {},\n  "creationHeight": 1451306,\n  "transactionId": "63c4bc030fdaffacb9309e0f1df1e6951c329f6c8fec73cc1e73e665f314eb50",\n  "index": 0\n}',
-      ),
+      {
+        boxId:
+          'a2376567a4627f4d6c6ce84723439a4b40236bb8cf4ac73cfae859e1481b42ac',
+        value: 1000000000,
+        ergoTree:
+          '0008cd0374be4846b83e90442a273bd9a37fb7d8dadb5612ca6c2b28c8233563cff46206',
+        assets: [],
+        additionalRegisters: {},
+        creationHeight: 1451306,
+        transactionId:
+          '63c4bc030fdaffacb9309e0f1df1e6951c329f6c8fec73cc1e73e665f314eb50',
+        index: 0,
+      },
     ];
 
     const wasmBoxes: ErgoBox[] = [ErgoBoxes.from_boxes_json(userBoxes).get(0)];
