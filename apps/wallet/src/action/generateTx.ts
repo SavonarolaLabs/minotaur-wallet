@@ -102,8 +102,8 @@ export async function generateTx(
   receivers: Array<ReceiverType>,
   fee: bigint,
   selectedBoxes: wasm.ErgoBox[],
+  height: number,
 ) {
-  const height = 1456180;
   const candidates = generateCandidates(height, receivers);
   const changeBox = generateChangeBox(
     selectedBoxes,

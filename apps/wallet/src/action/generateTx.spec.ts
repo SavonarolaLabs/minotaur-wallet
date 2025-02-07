@@ -57,12 +57,15 @@ describe('generateTx', () => {
     ];
 
     const wasmBoxes: ErgoBox[] = [ErgoBoxes.from_boxes_json(userBoxes).get(0)];
+    const height = 1456180;
+
     const { tx, boxes } = await generateTx(
       wallet,
       addresses,
       receivers,
       fee,
       wasmBoxes,
+      height,
     );
 
     const expectedTx = {
