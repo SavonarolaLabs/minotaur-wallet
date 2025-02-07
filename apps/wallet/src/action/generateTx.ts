@@ -2,8 +2,6 @@ import { StateWallet } from '@/store/reducer/wallet';
 
 import { ReceiverTokenType, ReceiverType } from '@/types/sign-modal';
 import * as wasm from 'ergo-lib-wasm-browser';
-import { deserialize } from './box';
-import Box from '@/db/entities/Box';
 
 const generateCandidates = (height: number, receivers: Array<ReceiverType>) =>
   receivers.map((receiver) => {
