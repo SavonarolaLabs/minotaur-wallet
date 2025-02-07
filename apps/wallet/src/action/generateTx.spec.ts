@@ -13,7 +13,7 @@ describe('generateTx', () => {
       tokens: [],
       addresses: [
         {
-          address: '9hMDjzgnrwET8dweNnK3wKHJf7Vi3zWcKsFEEcdETdSie34BQ16',
+          address: '3WwbzW6u8hKWBcL1W7kNVMr25s2UHfSBnYtwSHvrRQt7DdPuoXrt',
           walletId: 1,
           balance: '1000000000',
           name: 'Main Address',
@@ -33,7 +33,7 @@ describe('generateTx', () => {
     const addresses = [1];
     const receivers = [
       {
-        address: '9hMDjzgnrwET8dweNnK3wKHJf7Vi3zWcKsFEEcdETdSie34BQ16',
+        address: '3WwbzW6u8hKWBcL1W7kNVMr25s2UHfSBnYtwSHvrRQt7DdPuoXrt',
         amount: 100000000n,
         tokens: [],
       },
@@ -70,7 +70,7 @@ describe('generateTx', () => {
       },
     ];
 
-    const wasmBoxes = ErgoBoxes.from_boxes_json(userBoxes);
+    const wasmBoxes = [ErgoBoxes.from_boxes_json(userBoxes).get(0)];
     const { tx, boxes } = await generateTx(
       wallet,
       addresses,
