@@ -1,9 +1,17 @@
 import { StateWallet } from '@/store/reducer/wallet';
-
 import { ReceiverTokenType, ReceiverType } from '@/types/sign-modal';
 import * as wasm from 'ergo-lib-wasm-browser';
 
-const generateCandidates = (height: number, receivers: Array<ReceiverType>) =>
+const mapReceiversToOutputCandidates = (
+  height: number,
+  // 1456180
+  receivers: Array<ReceiverType>,
+  // [{
+  //   address: '3WwbzW6u8hKWBcL1W7kNVMr25s2UHfSBnYtwSHvrRQt7DdPuoXrt',
+  //   amount: 10_000_000n,
+  //   tokens: [],
+  // }]
+): wasm.ErgoBoxCandidate[] =>
   receivers.map((receiver) => {
     const builder = new wasm.ErgoBoxCandidateBuilder(
       wasm.BoxValue.from_i64(wasm.I64.from_str(receiver.amount.toString())),
@@ -32,7 +40,7 @@ const generateChangeBox = (
   fee: bigint,
   address: string,
   height: number,
-) => {
+): wasm.ErgoBoxCandidate | undefined => {
   let total = inputs
     .map((item) => BigInt(item.value().as_i64().to_str()))
     .reduce((a, b) => a + b, 0n);
@@ -96,35 +104,64 @@ const getBoxTokens = (
   return res;
 };
 
+function wrapInBoxSelection(inputs: wasm.ErgoBox[]): wasm.BoxSelection {
+  const inputBoxes: wasm.ErgoBoxes = wasm.ErgoBoxes.empty();
+  inputs.forEach((item) => inputBoxes.add(item));
+  const boxSelection = new wasm.BoxSelection(
+    inputBoxes,
+    new wasm.ErgoBoxAssetsDataList(),
+  );
+  return boxSelection;
+}
+
+function wrapInErgoBoxCandidates(
+  outputs: (wasm.ErgoBoxCandidate | undefined)[],
+): wasm.ErgoBoxCandidates {
+  const outputCandidates: wasm.ErgoBoxCandidates =
+    wasm.ErgoBoxCandidates.empty();
+
+  outputs
+    .filter((x) => x != undefined)
+    .forEach((box) => outputCandidates.add(box));
+  return outputCandidates;
+}
+
 export async function generateTx(
   wallet: StateWallet,
   addresses: Array<number>,
   receivers: Array<ReceiverType>,
+  // {
+  //   address: '3WwbzW6u8hKWBcL1W7kNVMr25s2UHfSBnYtwSHvrRQt7DdPuoXrt',
+  //   amount: 10_000_000n,
+  //   tokens: [],
+  // }
   fee: bigint,
   selectedBoxes: wasm.ErgoBox[],
   height: number,
+  // 1456180
 ) {
-  const candidates = generateCandidates(height, receivers);
-  const changeBox = generateChangeBox(
+  // Outputs
+  const candidates: wasm.ErgoBoxCandidate[] = mapReceiversToOutputCandidates(
+    height,
+    receivers,
+  );
+  const changeBox: wasm.ErgoBoxCandidate | undefined = generateChangeBox(
     selectedBoxes,
     candidates,
     fee,
     wallet.addresses.filter((item) => addresses.includes(item.id))[0].address,
     height,
   );
-  const inputBoxes = wasm.ErgoBoxes.empty();
-  selectedBoxes.forEach((item) => inputBoxes.add(item));
-  const boxSelection = new wasm.BoxSelection(
-    inputBoxes,
-    new wasm.ErgoBoxAssetsDataList(),
-  );
-  const candidateBoxes = wasm.ErgoBoxCandidates.empty();
-  candidates.forEach((box) => candidateBoxes.add(box));
-  if (changeBox) candidateBoxes.add(changeBox);
 
+  const outputCandidates: wasm.ErgoBoxCandidates = wrapInErgoBoxCandidates([
+    ...candidates,
+    changeBox,
+  ]);
+
+  // Transaction
   const tx = wasm.TxBuilder.new(
-    boxSelection,
-    candidateBoxes,
+    wrapInBoxSelection(selectedBoxes),
+    outputCandidates,
     height,
     wasm.BoxValue.from_i64(wasm.I64.from_str(fee.toString())),
     wasm.Address.from_base58(wallet.addresses[0].address),
