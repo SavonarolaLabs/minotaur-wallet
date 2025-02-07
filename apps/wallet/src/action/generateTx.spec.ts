@@ -65,7 +65,43 @@ describe('generateTx', () => {
       wasmBoxes,
     );
 
-    expect(tx).toBeDefined();
+    const expectedTx = {
+      inputs: [
+        {
+          boxId:
+            'a2376567a4627f4d6c6ce84723439a4b40236bb8cf4ac73cfae859e1481b42ac',
+          extension: {},
+        },
+      ],
+      dataInputs: [],
+      outputs: [
+        {
+          value: '10000000',
+          ergoTree:
+            '0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197',
+          assets: [],
+          additionalRegisters: {},
+          creationHeight: 1456180,
+        },
+        {
+          value: '988900000',
+          ergoTree:
+            '0008cd0374be4846b83e90442a273bd9a37fb7d8dadb5612ca6c2b28c8233563cff46206',
+          assets: [],
+          additionalRegisters: {},
+          creationHeight: 1456180,
+        },
+        {
+          value: '1100000',
+          ergoTree:
+            '1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304',
+          assets: [],
+          additionalRegisters: {},
+          creationHeight: 1456180,
+        },
+      ],
+    };
+    expect(tx).toStrictEqual(expectedTx);
     expect(boxes).toHaveLength(1);
   });
 });
