@@ -140,11 +140,29 @@ export async function generateTx(
   height: number,
   // 1456180
 ) {
-  // Outputs
+  // candidates =
+  // [{
+  //   value: '10000000',
+  //   ergoTree:
+  //     '0008cd028333f9f7454f8d5ff73dbac9833767ed6fc3a86cf0a73df946b32ea9927d9197',
+  //   assets: [],
+  //   additionalRegisters: {},
+  //   creationHeight: 1456180,
+  // }]
   const candidates: wasm.ErgoBoxCandidate[] = mapReceiversToOutputCandidates(
     height,
     receivers,
   );
+
+  // changeBox =
+  // {
+  //   value: '988900000',
+  //   ergoTree:
+  //     '0008cd0374be4846b83e90442a273bd9a37fb7d8dadb5612ca6c2b28c8233563cff46206',
+  //   assets: [],
+  //   additionalRegisters: {},
+  //   creationHeight: 1456180,
+  // }
   const changeBox: wasm.ErgoBoxCandidate | undefined = generateChangeBox(
     selectedBoxes,
     candidates,
@@ -160,10 +178,10 @@ export async function generateTx(
 
   // Transaction
   const tx = wasm.TxBuilder.new(
-    wrapInBoxSelection(selectedBoxes),
-    outputCandidates,
+    wrapInBoxSelection(selectedBoxes), // 1
+    outputCandidates, // 2 Boxes out
     height,
-    wasm.BoxValue.from_i64(wasm.I64.from_str(fee.toString())),
+    wasm.BoxValue.from_i64(wasm.I64.from_str(fee.toString())), // +1 Box out
     wasm.Address.from_base58(wallet.addresses[0].address),
   )
     .build()
