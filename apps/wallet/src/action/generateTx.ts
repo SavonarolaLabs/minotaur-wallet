@@ -176,13 +176,6 @@ export async function generateTx(
   candidates.forEach((box) => candidateBoxes.add(box));
   if (changeBox) candidateBoxes.add(changeBox);
 
-  for (let index = 0; index < boxSelection.boxes().len(); index++) {
-    const box = boxSelection.boxes().get(index);
-  }
-  for (let index = 0; index < candidateBoxes.len(); index++) {
-    const candidate = candidateBoxes.get(index);
-  }
-
   const tx = wasm.TxBuilder.new(
     boxSelection,
     candidateBoxes,
