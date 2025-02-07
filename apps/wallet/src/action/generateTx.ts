@@ -1,8 +1,9 @@
-import * as wasm from 'ergo-lib-wasm-browser';
-import { ReceiverTokenType, ReceiverType } from '@/types/sign-modal';
-import { BoxDbAction } from './db';
 import { StateWallet } from '@/store/reducer/wallet';
+
+import { ReceiverTokenType, ReceiverType } from '@/types/sign-modal';
+import * as wasm from 'ergo-lib-wasm-browser';
 import { deserialize } from './box';
+import Box from '@/db/entities/Box';
 
 const generateCandidates = (height: number, receivers: Array<ReceiverType>) =>
   receivers.map((receiver) => {
@@ -101,6 +102,7 @@ const selectBoxes = async (
   amount: bigint,
   tokens: Array<ReceiverTokenType>,
   addresses: Array<number>,
+  boxes: Box[],
 ) => {
   const minBoxValue = -BigInt(wasm.BoxValue.SAFE_USER_MIN().as_i64().to_str());
   const requiredTokens = receiverTokensToDict(tokens);
@@ -117,9 +119,7 @@ const selectBoxes = async (
     });
     amount -= BigInt(box.value().as_i64().to_str());
   };
-  for (const boxEntity of await BoxDbAction.getInstance().getAddressBoxes(
-    addresses,
-  )) {
+  for (const boxEntity of boxes) {
     if (boxEntity.spend_tx_id !== null) continue;
     const box = deserialize(boxEntity.serialized);
     if (amount > 0 || (amount < 0 && amount > minBoxValue)) {
@@ -155,26 +155,8 @@ export async function generateTx(
   addresses: Array<number>,
   receivers: Array<ReceiverType>,
   fee: bigint,
+  selectedBoxes: wasm.ErgoBox[],
 ) {
-  (BigInt.prototype as any).toJSON = function () {
-    return this.toString();
-  };
-
-  //console.log("## input wallet - " + JSON.stringify(wallet));
-  //console.log("## input addresses - " + JSON.stringify(addresses));
-  //console.log("## input receivers - " + JSON.stringify(receivers));
-  //console.log("## input fee - " + fee);
-
-  const boxes = await selectBoxes(
-    receivers.map((item) => item.amount).reduce((a, b) => a + b, fee),
-    receivers.map((item) => item.tokens).reduce((a, b) => [...a, ...b], []),
-    addresses,
-  );
-  if (!boxes.covered) {
-    // TODO must display required send-amount
-    throw Error('Not enough erg or tokens: ' + boxes.covering.join(', '));
-  }
-  const selectedBoxes = boxes.boxes;
   const height = 1456180;
   const candidates = generateCandidates(height, receivers);
   const changeBox = generateChangeBox(
@@ -196,13 +178,10 @@ export async function generateTx(
 
   for (let index = 0; index < boxSelection.boxes().len(); index++) {
     const box = boxSelection.boxes().get(index);
-    //console.log(`## interim boxSelection [${index}] - ${JSON.stringify(box.to_json())}`);
   }
   for (let index = 0; index < candidateBoxes.len(); index++) {
     const candidate = candidateBoxes.get(index);
-    //console.log(`## interim candidateBoxes [${index}] - ${candidate.value().as_i64().as_num()}`);
   }
-  //console.log("## interim height - " + JSON.stringify(height));
 
   const tx = wasm.TxBuilder.new(
     boxSelection,
@@ -211,10 +190,6 @@ export async function generateTx(
     wasm.BoxValue.from_i64(wasm.I64.from_str(fee.toString())),
     wasm.Address.from_base58(wallet.addresses[0].address),
   ).build();
-  // const reduced = wasm.ReducedTransaction.from_unsigned_tx(tx, inputBoxes, wasm.ErgoBoxes.empty(), await network.getContext())
-
-  //console.log("## return tx - " + JSON.stringify(tx.to_json()));
-  //console.log("## return selectedBoxes - " + JSON.stringify(selectedBoxes.map((item) => item.to_json())));
 
   return { tx, boxes: selectedBoxes };
 }
