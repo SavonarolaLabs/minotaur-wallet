@@ -98,58 +98,6 @@ const getBoxTokens = (
   return res;
 };
 
-const selectBoxes = async (
-  amount: bigint,
-  tokens: Array<ReceiverTokenType>,
-  addresses: Array<number>,
-  boxes: Box[],
-) => {
-  const minBoxValue = -BigInt(wasm.BoxValue.SAFE_USER_MIN().as_i64().to_str());
-  const requiredTokens = receiverTokensToDict(tokens);
-  const result: Array<wasm.ErgoBox> = [];
-  const selectBox = (box: wasm.ErgoBox) => {
-    result.push(box);
-    getBoxTokens(box).forEach((token) => {
-      if (Object.keys(requiredTokens).indexOf(token.id) !== -1) {
-        requiredTokens[token.id] -= token.amount;
-        if (requiredTokens[token.id] <= 0n) {
-          delete requiredTokens[token.id];
-        }
-      }
-    });
-    amount -= BigInt(box.value().as_i64().to_str());
-  };
-  for (const boxEntity of boxes) {
-    if (boxEntity.spend_tx_id !== null) continue;
-    const box = deserialize(boxEntity.serialized);
-    if (amount > 0 || (amount < 0 && amount > minBoxValue)) {
-      selectBox(box);
-    } else {
-      const boxTokens = getBoxTokens(box);
-      for (const token of boxTokens) {
-        if (Object.keys(requiredTokens).indexOf(token.id) !== -1) {
-          selectBox(box);
-        }
-      }
-    }
-    if (
-      (amount === 0n || amount < minBoxValue) &&
-      Object.keys(requiredTokens).length === 0
-    ) {
-      break;
-    }
-  }
-  const coveringMsg: Array<string> = [];
-  Object.entries(requiredTokens).forEach(([tokenId, amount]) => {
-    coveringMsg.push(`${tokenId.substring(0, 6)}... : ${amount.toString()}`);
-  });
-  return {
-    boxes: result,
-    covered: amount <= 0n && Object.keys(requiredTokens).length === 0,
-    covering: coveringMsg,
-  };
-};
-
 export async function generateTx(
   wallet: StateWallet,
   addresses: Array<number>,
